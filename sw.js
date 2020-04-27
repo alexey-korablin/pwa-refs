@@ -5,3 +5,7 @@ self.addEventListener('install', (evt) => {
 self.addEventListener('activate', (evt) => {
   console.log('SW has been activated!', evt);
 });
+
+self.addEventListener('fetch', (evt) => {
+  console.log('fetch event', evt);
+});
