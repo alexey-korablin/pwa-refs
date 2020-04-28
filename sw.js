@@ -1,4 +1,4 @@
-const staticCacheName = 'site-static-v2';
+const staticCacheName = 'site-static-v1';
 const dynamicCacheName = 'site-dynamic-v1';
 const assets = [
   '/',
@@ -13,6 +13,17 @@ const assets = [
   'https://fonts.googleapis.com/icon?family=Material+Icons',
   '/pages/fallback.html',
 ];
+
+//  cache size limitation
+const limitCacheSize = (name, size) => {
+  caches.open(name).then((cache) => {
+    cache.keys().then((keys) => {
+      if (keys.length > size) {
+        cache.delete(keys[0]).then(limitCacheSize(name, size));
+      }
+    });
+  });
+};
 
 self.addEventListener('install', (evt) => {
   console.log('SW has been installed!', evt);
@@ -52,6 +63,7 @@ self.addEventListener('fetch', (evt) => {
           fetch(evt.request).then((fetchRes) => {
             return caches.open(dynamicCacheName).then((cache) => {
               cache.put(evt.request.url, fetchRes.clone());
+              limitCacheSize(dynamicCacheName, 15);
               return fetchRes;
             });
           })
